@@ -1,0 +1,83 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Notification</title>
+</head>
+<body>
+    <button id="enable">Enable notifications</button>
+</body>
+<script>
+    window.addEventListener('load', function () {
+        // At first, let's check if we have permission for notification
+        // If not, let's ask for it
+        /*if (window.Notification && Notification.permission !== "granted") {
+          Notification.requestPermission(function (status) {
+            if (Notification.permission !== status) {
+              Notification.permission = status;
+            }
+          });
+
+        }*/
+        var icon='/1.png';
+        var cancelledManually = false;
+        let notificationPromise = () => new Promise(function(resolve, reject) {
+          if (window.Notification && Notification.permission !== "granted") {
+            //alert("only if notification is enabled we can send u customer detals");
+            Notification.requestPermission(function (status) {
+              if (Notification.permission !== "granted") {
+                if(cancelledManually){
+                  return resolve(true);
+                }else{
+                  return resolve(false);
+                }
+              }
+            });
+          }else{
+            resolve(true);
+          }
+        });
+      
+        notificationPromise().then(allowed => {
+          if(!allowed){
+            notAllowedCallback();
+          }
+        })
+      
+        const notAllowedCallback = function(){
+          notificationPromise().then(allowed => {
+            console.log(allowed);
+            if(!allowed && !cancelledManually){
+              alert("only if notification is enabled we can send u customer detals");
+              notAllowedCallback();
+              cancelledManually = true;
+            }
+          })
+        }
+        
+        var button = document.getElementById('enable');
+      
+        button.addEventListener('click', function () {
+          // If the user agreed to get notified
+          // Let's try to send ten notifications
+          if (window.Notification && Notification.permission === "granted") {
+              var icon='/1.png'
+ 
+              var n = new Notification("Hello There Dont Forget to Give a Star to My Github Repo" , {icon:icon,body: 'Notification From Anirudh',badge:icon,vibrate:[100, 50, 100]});
+          }
+      
+          else if (window.Notification && Notification.permission !== "denied") {
+            Notification.requestPermission(function (status) {
+      
+              // Otherwise, we can fallback to a regular modal alert
+              if (status=="denied") {
+            }
+          });
+        }
+
+    
+  
+        });
+      });
+</script>
+</html>
